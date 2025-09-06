@@ -1,0 +1,110 @@
+---
+title: "PS2-histograms"
+author: "Makayla"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+setwd("C:/Users/mlsch/OneDrive/Documents")
+```
+
+## R Markdown
+
+```{r}
+#practice_data <- PS2.test.histogram %>% 
+ # rename(length = V1, amountR1 = V2, ammountR2 = V3) 
+  
+pivoted_practice <- practice_data %>% 
+  pivot_longer(cols = c(amountR1, ammountR2))
+# barplot(TotalCounts, col=Grizzlies$Season)
+
+#ggplot(df, aes(x=value, fill=var)) +
+  #geom_histogram( color='#e9ecef', alpha=0.6, position='identity')
+
+practice_hist <- pivoted_practice %>% 
+  ggplot(aes(x = value, fill = name)) +
+  geom_histogram(color = "steelblue", alpha=0.6, position='identity')
+practice_hist
+```
+
+
+```{r}
+setwd("C:/Users/mlsch/OneDrive/Documents/")
+SRR25630310_R1_histData <- read.csv("C:/Users/mlsch/OneDrive/Documents/SRR25630310_R1_histData")
+SRR25630310_R2_histData <- read.csv("C:/Users/mlsch/OneDrive/Documents/SRR25630310_R2_histData")
+
+SRR25630391_R1_histData <- read.csv("C:/Users/mlsch/OneDrive/Documents/SRR25630391_R1_histData")
+SRR25630391_R2_histData <- read.csv("C:/Users/mlsch/OneDrive/Documents/SRR25630391_R2_histData")
+
+SRR25630310_R1_histData = SRR25630310_R1_histData %>% 
+  mutate(SRR10_R1 = X150) %>% select(SRR10_R1)
+
+SRR25630310_R2_histData = SRR25630310_R2_histData %>% 
+  mutate(SRR10_R2 = X150) %>% select(SRR10_R2)
+
+SRR25630391_R1_histData = SRR25630391_R1_histData %>% 
+  mutate(SRR91_R1 = X146) %>% select(SRR91_R1)
+
+SRR25630391_R2_histData = SRR25630391_R2_histData %>% 
+  mutate(SRR91_R2 = X146) %>% select(SRR91_R2)
+
+
+read_lengths_SRR10 = data.frame(SRR25630310_R1_histData$SRR10_R1,
+                          SRR25630310_R2_histData$SRR10_R2)
+
+read_lengths_SRR91 = data.frame(SRR25630391_R1_histData,
+                                SRR25630391_R2_histData)
+
+longer_SRR10 = read_lengths_SRR10 %>% 
+  mutate(SRR10_R1 = SRR25630310_R1_histData.SRR10_R1) %>% 
+  mutate(SRR10_R2 = SRR25630310_R2_histData.SRR10_R2) %>% 
+  select(SRR10_R1, SRR10_R2) %>% 
+  pivot_longer(cols = c(SRR10_R1, SRR10_R2)) %>% 
+  mutate(read = name) %>% 
+  mutate(length = value) %>% 
+  select(read, length)
+
+longer_SRR91 = read_lengths_SRR91 %>%
+  mutate(SRR91_R2 = SRR91_R1.1) %>% 
+  select(SRR91_R1, SRR91_R2) %>% 
+  pivot_longer(cols = c(SRR91_R1, SRR91_R2)) %>% 
+  mutate(read = name) %>% 
+  mutate(length = value) %>% 
+  select(read, length)
+
+```
+
+
+
+Let's try this histogram...
+
+```{r}
+
+SRR10_hist = longer_SRR10 %>% 
+  ggplot(aes(x = length, fill=read)) + 
+  geom_histogram(color='#e9ecef', alpha=0.5, position='identity') +
+  ylab("Length") +
+  xlab("Number of Reads") +
+  ggtitle("Length Distribution of SRR25630310") +
+  theme_bw()
+
+SRR10_hist
+
+SRR91_hist = longer_SRR91 %>% 
+  ggplot(aes(x = length, fill=read)) + 
+  geom_histogram(color='#e9ecef', alpha=0.5, position='identity') +
+  ylab("Length") +
+  xlab("Number of Reads") +
+  ggtitle("Length Distribution of SRR25630391") +
+  theme_bw() 
+
+SRR91_hist
+
+ggsave("SRR10_hist.png", plot = SRR10_hist)
+ggsave("SRR91_hist.png", plot = SRR91_hist)
+getwd()
+```
